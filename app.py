@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 
-from src.config.envConfig import CORS
+from src.config.envConfig import DB
 
 app = Flask(__name__)
 CORS(app)

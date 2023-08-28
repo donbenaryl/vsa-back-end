@@ -1,9 +1,9 @@
 from typing import List
 
-from pydantic import AnyHttpUrl, BaseSettings
+from pydantic import AnyHttpUrl, BaseModel
 
 
-class Config(BaseSettings):
+class Config(BaseModel):
     API_V1_STR: str = "/api/v1"
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \

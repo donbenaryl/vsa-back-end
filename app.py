@@ -1,10 +1,5 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask
 from flask_cors import CORS
-from sqlalchemy import Column, Integer, String, TIMESTAMP, inspect, create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from datetime import datetime, timedelta
-import cryptocode
-from jose import JWTError, jwt
 
 from src.config.envConfig import CORS
 

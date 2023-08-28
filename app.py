@@ -2,8 +2,10 @@ from flask import Flask
 from flask_cors import CORS
 
 from src.config.envConfig import DB
+from src.app.auth.routes import auth
 
 app = Flask(__name__)
+app.register_blueprint(auth)
 CORS(app)
 # cors = CORS(app, resources={r"/api": {"origins": "http://localhost:4200"}})
 # cors = CORS(app, resources={r"/api/*": {"origins": "*"}})

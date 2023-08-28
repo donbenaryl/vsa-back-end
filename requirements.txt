@@ -3,6 +3,7 @@ Flask==2.3.3
 PyMySQL==1.1.0
 Flask-Cors==4.0.0
 Flask-Simple-Crypt==0.3.3
+Flask-Pydantic==0.11.0
 jose==1.0.0
 python-jose==3.3.0
 cryptocode==0.1

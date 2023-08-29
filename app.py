@@ -6,14 +6,14 @@ from src.app.auth.routes import auth
 
 app = Flask(__name__)
 app.register_blueprint(auth)
-CORS(app)
+# CORS(app)
 # cors = CORS(app, resources={r"/api": {"origins": "http://localhost:4200"}})
 # cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-# cors = CORS(app, resource={
-#     r"/*":{
-#         "origins":"*"
-#     }
-# })
+cors = CORS(app, resource={
+    r"/*":{
+        "origins":"*"
+    }
+})
 # app = CORS(app, resources={r"/api/*": {"origins": ["http://localhost:4200", "http://www.domain2.com"]}})
 
 # cors = CORS(app, origins=['http://localhost:4200', 'http://192.168.1.163:4200'])

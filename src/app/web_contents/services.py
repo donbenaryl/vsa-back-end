@@ -2,12 +2,13 @@ from src.app.auth.schemas import IUserBasicDetails, INewUserData
 from src.config.db import get_db
 from src.app.auth.models import User, UserInDB
 from datetime import datetime, timedelta
-from src.config.envConfig import USER
 
 from flask import jsonify, make_response
 import cryptocode
-from jose import jwt, JWTError
+from jose import jwt
 
+USER_KEY = "0x66dFA4b56678B6EdE0ab2765804EeB009dc0EE47"
+SECRET_KEY = "12da3c99a9c42c33347b67e452af5e8b9bad81bc4fbfb777af9749cbc6e5399d"
 
 def process_login(data: IUserBasicDetails):
     db = next(get_db())
@@ -20,7 +21,7 @@ def process_login(data: IUserBasicDetails):
         }), 404) 
 
     # INVALID PASSWORD
-    if data.password != cryptocode.decrypt(user.password, USER.USER_KEY):
+    if data.password != cryptocode.decrypt(user.password, USER_KEY):
         return make_response(jsonify({
             "msg": "Invalid username or password"
         }), 404) 
@@ -28,10 +29,10 @@ def process_login(data: IUserBasicDetails):
 
     to_encode = {
         "email": data.email,
-        "exp": datetime.utcnow() + timedelta(minutes = 1000)
+        "exp": datetime.utcnow() + timedelta(minutes = 0)
     }
 
-    encoded_jwt = jwt.encode(to_encode, USER.TOKEN_SECRET_KEY, algorithm="HS256")
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm="HS256")
 
     return make_response(jsonify({
         "token": encoded_jwt
@@ -56,7 +57,7 @@ def process_registration(data: INewUserData):
     
     # INSERT USER
     to_save = {
-        "password": cryptocode.encrypt(data.password, USER.USER_KEY),
+        "password": cryptocode.encrypt(data.password, USER_KEY),
         "email": data.email
     }
     
@@ -64,26 +65,3 @@ def process_registration(data: INewUserData):
     db.commit()
 
     return ("", 204)
-
-
-def get_current_user(bearer: str):
-    try:
-        split_bearer = bearer.split(" ")
-        payload = jwt.decode(split_bearer[1], USER.TOKEN_SECRET_KEY, algorithms = "HS256")
-        print(payload)
-
-        if payload:
-            email: str = payload.get("email")
-
-            return make_response(jsonify({
-                "email": email
-            }), 200)
-        else:
-            return make_response(jsonify({
-                "msg": "Unauthorized User"
-            }), 401)  
-
-    except JWTError:
-        return make_response(jsonify({
-            "msg": "Unauthorized User"
-        }), 401)

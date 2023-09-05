@@ -24,6 +24,7 @@ def process_login(data: IUserBasicDetails):
 
     logger.info(f"Checking if password {cryptocode.decrypt(user.password, USER.USER_KEY)} correct...")
     logger.info(f"UK: {USER.USER_KEY}")
+    logger.info(f"PS: {user.password}")
     # INVALID PASSWORD
     if data.password != cryptocode.decrypt(user.password, USER.USER_KEY):
         return make_response(jsonify({

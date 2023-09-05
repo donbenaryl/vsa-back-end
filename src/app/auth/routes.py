@@ -23,6 +23,4 @@ def register(body: INewUserData):
 @auth.route('/users/me', methods=["GET"])
 @validate()
 def current_user():
-    headers = request.headers
-    bearer = headers.get('Authorization')
-    return get_current_user(bearer)
+    return get_current_user()

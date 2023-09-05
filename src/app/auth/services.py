@@ -4,7 +4,7 @@ from src.app.auth.models import User, UserInDB
 from datetime import datetime, timedelta
 from src.config.envConfig import USER
 
-from flask import jsonify, make_response
+from flask import jsonify, make_response, request
 import cryptocode
 from jose import jwt, JWTError
 
@@ -66,24 +66,42 @@ def process_registration(data: INewUserData):
     return ("", 204)
 
 
-def get_current_user(bearer: str):
+def get_current_user():
     try:
-        split_bearer = bearer.split(" ")
-        payload = jwt.decode(split_bearer[1], USER.TOKEN_SECRET_KEY, algorithms = "HS256")
-        print(payload)
+        headers = request.headers
+        bearer = headers.get('Authorization')
+        # print("email22email22email22email22", bearer)
+        auth_header = request.headers.get("Authorization")
 
-        if payload:
-            email: str = payload.get("email")
+        if "Bearer" in auth_header:
+            token = auth_header.split(' ')[1]
+            payload = jwt.decode(token, USER.TOKEN_SECRET_KEY, algorithms = "HS256")
 
-            return make_response(jsonify({
-                "email": email
-            }), 200)
-        else:
-            return make_response(jsonify({
-                "msg": "Unauthorized User"
-            }), 401)  
+            if payload:
+                email: str = payload.get("email")
 
-    except JWTError:
+                return make_response(jsonify({
+                    "email": email
+                }), 200)
+            else:
+                return make_response(jsonify({
+                    "msg": "Unauthorized User"
+                }), 401)  
+        
         return make_response(jsonify({
             "msg": "Unauthorized User"
         }), 401)
+
+    except Exception as err:
+        print(err)
+        return make_response(jsonify({
+            "msg": "Unauthorized User"
+        }), 401)
+
+
+# def check_authentication(): 
+#     user = get_current_user()
+#     print("user", user.json)
+    
+#     if user.status_code != 200:
+#         return user

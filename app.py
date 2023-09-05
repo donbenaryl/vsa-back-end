@@ -16,7 +16,7 @@ app.register_blueprint(leads, url_prefix='/leads')
 # CORS(app)
 # cors = CORS(app, resources={r"/api": {"origins": "http://localhost:4200"}})
 # cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-cors = CORS(app, resources={r"/*": {"origins": ("http://localhost:4200", "http://vsa-be.azie-don.com/")}})
+cors = CORS(app, resources={r"/*": {"origins": ("http://localhost:4200", "http://vsa-be.azie-don.com","http://vsa-test.azie-don.com")}})
 # cors = CORS(app, resource={
 #     r"/*":{
 #         "origins":"*"

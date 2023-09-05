@@ -3,6 +3,7 @@ from src.config.db import get_db
 from src.app.auth.models import User, UserInDB
 from datetime import datetime, timedelta
 from src.config.envConfig import USER
+from src.config.logger import logger
 
 from flask import jsonify, make_response, request
 import cryptocode
@@ -11,6 +12,8 @@ from jose import jwt, JWTError
 
 def process_login(data: IUserBasicDetails):
     db = next(get_db())
+
+    logger.info(f"Looking if user {data.email} exists...")
     user = db.query(UserInDB).filter(UserInDB.email == data.email).first()
     
     # EMAIL NOT FOUND
@@ -19,13 +22,14 @@ def process_login(data: IUserBasicDetails):
             "msg": "Invalid username or password"
         }), 404) 
 
+    logger.info(f"Checking if password {cryptocode.decrypt(user.password, USER.USER_KEY)} correct...")
     # INVALID PASSWORD
     if data.password != cryptocode.decrypt(user.password, USER.USER_KEY):
         return make_response(jsonify({
             "msg": "Invalid username or password"
         }), 404) 
 
-
+    logger.info(f"Encoding user {data.email}...")
     to_encode = {
         "email": data.email,
         "exp": datetime.utcnow() + timedelta(minutes = 1000)

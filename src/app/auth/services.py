@@ -22,9 +22,11 @@ def process_login(data: IUserBasicDetails):
             "msg": "Invalid username or password"
         }), 404) 
 
-    logger.info(f"Checking if password {cryptocode.decrypt(user.password, USER.USER_KEY)} correct...")
+    logger.info(f"Checking if password {cryptocode.decrypt('fXOufPY3a3g=*mHKjJUF8iYPrghXpMm6DcA==*G59+aEdjw8ARfDOAwbkSNQ==*e1OA8HgsTzQ6pP0bukkoRQ==', '	0x66dFA4b56678B6EdE0ab2765804EeB009dc0EE47')} correct...")
     logger.info(f"UK: {USER.USER_KEY}")
     logger.info(f"PS: {user.password}")
+    logger.info(f"Type: {type(user.password)}")
+    
     # INVALID PASSWORD
     if data.password != cryptocode.decrypt(user.password, USER.USER_KEY):
         return make_response(jsonify({

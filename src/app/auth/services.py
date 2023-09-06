@@ -11,6 +11,20 @@ from jose import jwt, JWTError
 
 
 def process_login(data: IUserBasicDetails):
+
+    key = "0x66dFA4b56678B6EdE0ab2765804EeB009dc0EE47"
+    # USED FOR CREATING PASSWORD
+    encoded = cryptocode.encrypt("password", key)
+    print(encoded)
+    ## DECODING
+    decoded = cryptocode.decrypt(encoded, key)
+
+    print({
+        "encoded": encoded,
+        "decoded": decoded
+    })
+
+
     db = next(get_db())
 
     logger.info(f"Looking if user {data.email} exists...")

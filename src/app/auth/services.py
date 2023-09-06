@@ -6,25 +6,26 @@ from src.config.envConfig import USER
 from src.config.logger import logger
 
 from flask import jsonify, make_response, request
-import cryptocode
 from jose import jwt, JWTError
+import base64
+from Crypto.Cipher import AES
+
+
+KEY = bytes(USER.USER_KEY, encoding="raw_unicode_escape")
+cipher = AES.new(KEY, AES.MODE_ECB)
+
+
+def encode_string(string: str):
+    password = bytes(string, encoding="raw_unicode_escape").rjust(32)
+    return base64.b64encode(cipher.encrypt(password))
+
+
+def decode_string(string):
+    encoded_password = bytes(string, encoding="raw_unicode_escape").rjust(32)
+    return str(cipher.decrypt(base64.b64decode(encoded_password)), 'utf-8').strip()
 
 
 def process_login(data: IUserBasicDetails):
-
-    key = "0x66dFA4b56678B6EdE0ab2765804EeB009dc0EE47"
-    # USED FOR CREATING PASSWORD
-    encoded = cryptocode.encrypt("password", key)
-    print(encoded)
-    ## DECODING
-    decoded = cryptocode.decrypt(encoded, key)
-
-    print({
-        "encoded": encoded,
-        "decoded": decoded
-    })
-
-
     db = next(get_db())
 
     logger.info(f"Looking if user {data.email} exists...")
@@ -34,15 +35,17 @@ def process_login(data: IUserBasicDetails):
     if not user:
         return make_response(jsonify({
             "msg": "Invalid username or password"
-        }), 404) 
+        }), 404)
 
-    logger.info(f"Checking if password {cryptocode.decrypt('fXOufPY3a3g=*mHKjJUF8iYPrghXpMm6DcA==*G59+aEdjw8ARfDOAwbkSNQ==*e1OA8HgsTzQ6pP0bukkoRQ==', '0x66dFA4b56678B6EdE0ab2765804EeB009dc0EE47')} correct... False means not working.")
-    logger.info(f"UK: {USER.USER_KEY}")
-    logger.info(f"PS: {user.password}")
-    logger.info(f"Type: {type(user.password)}")
+    # encoded = encode_string(data.password)
+    # encoded = str(encoded, 'utf-8').strip()
+    # print("encoded", encoded)
+
+    # decoded = decode_string(encoded)
+    # print("decoded", decoded)
     
     # INVALID PASSWORD
-    if data.password != cryptocode.decrypt(user.password, USER.USER_KEY):
+    if data.password != decode_string(user.password):
         return make_response(jsonify({
             "msg": "Invalid username or password"
         }), 404) 
@@ -78,7 +81,7 @@ def process_registration(data: INewUserData):
     
     # INSERT USER
     to_save = {
-        "password": cryptocode.encrypt(data.password, USER.USER_KEY),
+        "password": encode_string(data.password),
         "email": data.email
     }
     

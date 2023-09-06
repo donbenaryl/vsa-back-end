@@ -14,7 +14,7 @@ class Config(BaseModel):
     DB_PASSWORD: str = "password"
     DB_HOST: str = "localhost"
     DB_PORT: int = 3306
-    USER_KEY: str = "0x66dFA4b56678B6EdE0ab2765804EeB009dc0EE47"
+    USER_KEY: str = "0x66dFA4b56678B6"
     TOKEN_SECRET_KEY: str = "12da3c99a9c42c33347b67e452af5e8b9bad81bc4fbfb777af9749cbc6e5399d"
 
 

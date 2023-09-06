@@ -1,4 +1,4 @@
-from src.app.auth.schemas import IUserBasicDetails, INewUserData
+from src.app.auth.schemas import IUserBasicDetails, INewUserData, IChangePasswordParams
 from src.config.db import get_db
 from src.app.auth.models import User, UserInDB
 from datetime import datetime, timedelta
@@ -124,9 +124,54 @@ def get_current_user():
         }), 401)
 
 
-# def check_authentication(): 
-#     user = get_current_user()
-#     print("user", user.json)
+def get_all_users():
+    db = next(get_db())
+
+    return User.serialize_list(db.query(User).order_by(User.id.desc()).all())
+
+
+def update_password(body: IChangePasswordParams):
+    email = get_current_user()
+
+    print(email.json["email"])
     
-#     if user.status_code != 200:
-#         return user
+    if email.status_code == 401:
+        return email
+    # return(email, 200)
+    # return email
+    # return ''
+
+    db = next(get_db())
+    user = db.query(UserInDB).filter(UserInDB.email == email.json["email"]).first()
+
+    if user:
+        if body.old_password != decode_string(user.password):
+            return make_response(jsonify({
+                "msg": "Old password is incorrect"
+            }), 404) 
+
+        if body.new_password != body.re_password:
+            return make_response(jsonify({
+                "msg": "Password does not match"
+            }), 400)
+
+        encoded = encode_string(body.new_password)
+        encoded = str(encoded, 'utf-8').strip()
+
+        db = next(get_db())
+        (
+            db.query(UserInDB)
+                .filter(
+                    UserInDB.id == user.id
+                )
+                .update({
+                    "password": encoded
+                })
+        )
+        db.commit()
+
+        return ("", 204)
+
+    return make_response(jsonify({
+        "msg": "Unauthorized User"
+    }), 401)

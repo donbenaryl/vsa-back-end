@@ -1,6 +1,7 @@
 from src.app.web_contents.schemas import IBasicDetailUpdateData, IPageDetails
 from src.config.db import get_db
 from src.app.web_contents.models import BasicDetails, PageDetails
+import json
 
 from flask import jsonify, make_response
 
@@ -131,3 +132,23 @@ def update_basic_details(body: IBasicDetailUpdateData):
     db.commit()
 
     return ('', 204)
+
+def convert_to_dict(row):
+    return row.toDict()
+
+
+def get_home_page_data():
+    db = next(get_db())
+
+    basic_details = BasicDetails.serialize_list(db.query(BasicDetails).all())
+    dynamic_data = db.query(PageDetails).filter(
+        PageDetails.page_module.in_((1,2,3,4))
+    ).all()
+
+    return {
+        "basic_details": basic_details,
+        "goals": PageDetails.serialize_list(filter(lambda row: row.page_module == 1, dynamic_data)),
+        "services": PageDetails.serialize_list(filter(lambda row: row.page_module == 2, dynamic_data)),
+        "why_us": PageDetails.serialize_list(filter(lambda row: row.page_module == 3, dynamic_data)),
+        "why_our_services": PageDetails.serialize_list(filter(lambda row: row.page_module == 4, dynamic_data))
+    }

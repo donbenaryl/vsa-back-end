@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_pydantic import validate
-from src.app.web_contents.services import get_basic_details, update_basic_details, get_page_details, update_page_details, get_page_detail
+from src.app.web_contents.services import get_basic_details, update_basic_details, get_page_details, update_page_details, get_page_detail, get_home_page_data
 from src.app.web_contents.schemas import IBasicDetailUpdateData, IPageDetails
 
 
@@ -105,4 +105,8 @@ def set_careers():
     return update_page_details(data, 6)
 
 
+@web_contents.route('/home-page-data', methods=["GET"])
+@validate()
+def home_page_data():
+    return get_home_page_data()
 
